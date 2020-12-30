@@ -114,7 +114,7 @@ class Frame(wx.Frame):
         wx.Frame.__init__(self,None,title = u"",pos=(self._screen_x_offset, window_y),size=(self._screen_width,image.GetHeight()),style=wx.SIMPLE_BORDER|wx.TRANSPARENT_WINDOW|wx.STAY_ON_TOP)
         self.SetTransparent(100)
 
-        self.panel = wx.Panel(self) #size=(self._screen_size[0],image.GetHeight() * 1), style=wx.TRANSPARENT_WINDOW)
+        self.panel = wx.Panel(self)
         self.panel.SetTransparent(100)
         self.locale = wx.Locale(wx.LANGUAGE_ENGLISH)
         self._imageBitmap = wx.StaticBitmap(self.panel, wx.ID_ANY, wx.Bitmap(image))
