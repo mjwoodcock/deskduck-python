@@ -2,6 +2,7 @@
 
 import wx
 import sys
+import random
  
 
 class MyPopupMenu(wx.Menu):
@@ -71,6 +72,13 @@ class Frame(wx.Frame):
     _screen_x_offset = 0
     _screen_y_offset = 0
     _sleeping = False
+    _target_offset = 0
+
+    def _set_target_offset(self):
+        if self._states[self._duck_state]["direction"] == 1:
+            self._target_offset = random.randint(self._duck_pos + 10, self._screen_width - self._duck_width)
+        elif self._states[self._duck_state]["direction"] == -1:
+            self._target_offset = random.randint(0, self._duck_pos - 10)
 
     def _load_images(self):
         for i in range(1, 70):
@@ -93,6 +101,7 @@ class Frame(wx.Frame):
 
         self.panel.Bind(wx.EVT_RIGHT_DOWN, self._on_right_down)
 
+        self._set_target_offset()
         self._timer = wx.Timer(self, 1)
         self.Bind(wx.EVT_TIMER, self._on_timer_event)
         self._timer.Start(50)
@@ -127,7 +136,7 @@ class Frame(wx.Frame):
             if self._duck_image_idx == len(state["img_idx"]):
                 new_duck_state = state["next_state"]
         elif self._duck_state == "right":
-            if self._duck_pos > self._screen_width - self._duck_width:
+            if self._duck_pos > self._target_offset:
                 new_duck_state = state["next_state"]
             elif self._sleeping:
                 new_duck_state = "right_sleep"
@@ -137,7 +146,7 @@ class Frame(wx.Frame):
             if self._duck_image_idx == len(state["img_idx"]):
                 new_duck_state = state["next_state"]
         elif self._duck_state == "left":
-            if self._duck_pos < 0:
+            if self._duck_pos < self._target_offset:
                 new_duck_state = state["next_state"]
             elif self._sleeping:
                 new_duck_state = "left_sleep"
@@ -150,6 +159,7 @@ class Frame(wx.Frame):
         if new_duck_state:
             self._duck_state = new_duck_state
             self._duck_image_idx = 0
+            self._set_target_offset()
 
 
 if __name__ == "__main__":
