@@ -119,13 +119,17 @@ class Frame(wx.Frame):
         new_duck_state = None
         state = self._states[self._duck_state]
         self._duck_pos = self._duck_pos + state["direction"] * 2
+
         try:
-            self._imageBitmap.SetBitmap(wx.Bitmap(self._images[state["img_idx"][self._duck_image_idx]]))
+            new_image = self._images[state["img_idx"][self._duck_image_idx]]
+            image_height = new_image.GetHeight()
+            self._imageBitmap.SetBitmap(wx.Bitmap(new_image))
         except:
             print("oops")
+            print(sys.exc_info())
             sys.exit(1)
         self._imageBitmap.Refresh()
-        self._imageBitmap.SetPosition((self._duck_pos, 0))
+        self._imageBitmap.SetPosition((self._duck_pos, self._duck_height - image_height))
         self._duck_image_idx += 1
         if self._duck_image_idx == len(state["img_idx"]) and state["repeat_last_images"] > 0:
             self._duck_image_idx -= state["repeat_last_images"]
