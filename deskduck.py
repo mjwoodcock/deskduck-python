@@ -12,7 +12,11 @@ class MyPopupMenu(wx.Menu):
 
         self.parent = parent
 
-        sleep_menu = wx.MenuItem(self, wx.ID_ANY, 'Sleep')
+        ontop_menu = wx.MenuItem(self, wx.ID_ANY, 'Stay on top', kind=wx.ITEM_CHECK)
+        self.Append(ontop_menu)
+        self.Bind(wx.EVT_MENU, self._on_top, ontop_menu)
+
+        sleep_menu = wx.MenuItem(self, wx.ID_ANY, 'Sleep', kind=wx.ITEM_CHECK)
         self.Append(sleep_menu)
         self.Bind(wx.EVT_MENU, self._on_sleep, sleep_menu)
 
@@ -20,12 +24,17 @@ class MyPopupMenu(wx.Menu):
         self.Append(quit_menu)
         self.Bind(wx.EVT_MENU, self._on_quit, quit_menu)
 
+        ontop_menu.Check(check=self.parent.get_stay_on_top())
+        sleep_menu.Check(check=self.parent.get_sleeping())
 
     def _on_quit(self, e):
         self.parent.quit()
 
     def _on_sleep(self, e):
         self.parent.sleep()
+
+    def _on_top(self, e):
+        self.parent.toggle_stay_on_top()
 
 
 class Frame(wx.Frame):
@@ -119,6 +128,15 @@ class Frame(wx.Frame):
 
     def sleep(self):
         self._sleeping = not self._sleeping
+
+    def get_sleeping(self):
+        return self._sleeping
+
+    def toggle_stay_on_top(self):
+        self.ToggleWindowStyle(wx.STAY_ON_TOP)
+
+    def get_stay_on_top(self):
+        return self.HasFlag(wx.STAY_ON_TOP)
 
     def _on_right_down(self, event):
         self.PopupMenu(MyPopupMenu(self), event.GetPosition())
