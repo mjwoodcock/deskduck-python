@@ -33,7 +33,7 @@ class Frame(wx.Frame):
                          "repeat_last_images": 1,
                          "next_state": "turn_left",
                          "direction": 1},
-               "right_sleeping": {"img_idx": [59, 60, 61, 62, 63],
+               "right_sleep": {"img_idx": [59, 60, 61, 62, 63],
                          "repeat_last_images": 1,
                          "next_state": "right_wakeup",
                          "direction": 0},
@@ -45,6 +45,14 @@ class Frame(wx.Frame):
                         "repeat_last_images": 1,
                         "next_state": "turn_right",
                         "direction": -1},
+               "left_sleep": {"img_idx": [64, 65, 66, 67, 68],
+                         "repeat_last_images": 1,
+                         "next_state": "left_wakeup",
+                         "direction": 0},
+               "left_wakeup": {"img_idx": [68, 67, 66, 65, 64],
+                         "repeat_last_images": 0,
+                         "next_state": "left",
+                         "direction": 0},
                "turn_left": {"img_idx": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
                         "repeat_last_images": 0,
                         "next_state": "left",
@@ -65,7 +73,7 @@ class Frame(wx.Frame):
     _sleeping = False
 
     def _load_images(self):
-        for i in range(1, 65):
+        for i in range(1, 70):
             self._images.append(wx.Image('images/duck{0}.png'.format(i), wx.BITMAP_TYPE_ANY))
         self._duck_height = self._images[0].GetHeight()
         self._duck_width = self._images[0].GetWidth()
@@ -122,14 +130,22 @@ class Frame(wx.Frame):
             if self._duck_pos > self._screen_width - self._duck_width:
                 new_duck_state = state["next_state"]
             elif self._sleeping:
-                self._duck_state = "right_sleeping"
-        elif self._duck_state == "right_sleeping" and not self._sleeping:
+                new_duck_state = "right_sleep"
+        elif self._duck_state == "right_sleep" and not self._sleeping:
             new_duck_state = state["next_state"]
         elif self._duck_state == "right_wakeup":
             if self._duck_image_idx == len(state["img_idx"]):
                 new_duck_state = state["next_state"]
-        elif self._duck_state == "left" and self._duck_pos < 0:
+        elif self._duck_state == "left":
+            if self._duck_pos < 0:
+                new_duck_state = state["next_state"]
+            elif self._sleeping:
+                new_duck_state = "left_sleep"
+        elif self._duck_state == "left_sleep" and not self._sleeping:
             new_duck_state = state["next_state"]
+        elif self._duck_state == "left_wakeup":
+            if self._duck_image_idx == len(state["img_idx"]):
+                new_duck_state = state["next_state"]
 
         if new_duck_state:
             self._duck_state = new_duck_state
