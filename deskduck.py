@@ -97,6 +97,9 @@ class Frame(wx.Frame):
         elif self._states[self._duck_state]["direction"] == -1:
             self._target_offset = random.randint(0, self._duck_pos - 10)
 
+    def _should_bob(self):
+        return random.randint(0, 1000) < 5
+
     def _load_images(self):
         for i in range(1, 70):
             self._images.append(wx.Image('images/duck{0}.png'.format(i), wx.BITMAP_TYPE_ANY))
@@ -159,42 +162,26 @@ class Frame(wx.Frame):
         self._duck_image_idx += 1
         if self._duck_image_idx == len(state["img_idx"]) and state["repeat_last_images"] > 0:
             self._duck_image_idx -= state["repeat_last_images"]
-        if self._duck_state == "turn_left":
-            if self._duck_image_idx == len(state["img_idx"]):
-                new_duck_state = state["next_state"]
-        if self._duck_state == "turn_right":
-            if self._duck_image_idx == len(state["img_idx"]):
-                new_duck_state = state["next_state"]
+        if self._duck_image_idx == len(state["img_idx"]):
+            new_duck_state = state["next_state"]
         elif self._duck_state == "right":
             if self._duck_pos > self._target_offset:
                 new_duck_state = state["next_state"]
             elif self._sleeping:
                 new_duck_state = "right_sleep"
-            elif random.randint(0, 1000) < 5:
+            elif self._should_bob():
                 new_duck_state = "right_bob"
-        elif self._duck_state == "right_bob":
-            if self._duck_image_idx == len(state["img_idx"]):
-                new_duck_state = state["next_state"]
         elif self._duck_state == "right_sleep" and not self._sleeping:
             new_duck_state = state["next_state"]
-        elif self._duck_state == "right_wakeup":
-            if self._duck_image_idx == len(state["img_idx"]):
-                new_duck_state = state["next_state"]
         elif self._duck_state == "left":
             if self._duck_pos < self._target_offset:
                 new_duck_state = state["next_state"]
             elif self._sleeping:
                 new_duck_state = "left_sleep"
-            elif random.randint(0, 1000) < 5:
+            elif self._should_bob():
                 new_duck_state = "left_bob"
-        elif self._duck_state == "left_bob":
-            if self._duck_image_idx == len(state["img_idx"]):
-                new_duck_state = state["next_state"]
         elif self._duck_state == "left_sleep" and not self._sleeping:
             new_duck_state = state["next_state"]
-        elif self._duck_state == "left_wakeup":
-            if self._duck_image_idx == len(state["img_idx"]):
-                new_duck_state = state["next_state"]
 
         if new_duck_state:
             self._duck_state = new_duck_state
